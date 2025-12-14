@@ -10,10 +10,14 @@ const quoteDisplay = document.getElementById("quoteDisplay");
 const newQuoteBtn = document.getElementById("newQuote");
 
 // Show random quote
-function showRandomQuote() {
+function displayRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
-  quoteDisplay.textContent = `"${quotes[randomIndex].text}"`;
+  quoteDisplay.innerHTML = `
+    <p>"${quotes[randomIndex].text}"</p>
+    <small>Category: ${quotes[randomIndex].category}</small>
+  `;
 }
+
 
 // Create Add Quote Form dynamically (advanced DOM)
 function createAddQuoteForm() {
@@ -42,7 +46,8 @@ function createAddQuoteForm() {
     quotes.push({ text, category });
     quoteInput.value = "";
     categoryInput.value = "";
-    showRandomQuote();
+    displayRandomQuote();
+
   });
 
   formDiv.appendChild(quoteInput);
@@ -65,12 +70,14 @@ function addQuote() {
   quotes.push({ text, category });
   document.getElementById("newQuoteText").value = "";
   document.getElementById("newQuoteCategory").value = "";
-  showRandomQuote();
+  displayRandomQuote();
+
 }
 
 // Event Listeners
 newQuoteBtn.addEventListener("click", showRandomQuote);
 
 // Initialize
-showRandomQuote();
+displayRandomQuote();
+
 createAddQuoteForm();
