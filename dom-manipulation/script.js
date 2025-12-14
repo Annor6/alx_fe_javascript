@@ -1,4 +1,21 @@
 const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
+async function postQuoteToServer(quote) {
+  try {
+    const response = await fetch(SERVER_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(quote)
+    });
+
+    const data = await response.json();
+    console.log("Quote posted to server:", data);
+  } catch (error) {
+    console.error("Error posting quote:", error);
+  }
+}
+
 async function fetchQuotesFromServer() {
   const response = await fetch(SERVER_URL);
   const data = await response.json();
@@ -175,6 +192,7 @@ saveQuotes();
 populateCategories();
 filterQuotes();
 
+postQuoteToServer({ text, category });
 
 
 }
