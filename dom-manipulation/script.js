@@ -44,7 +44,8 @@ async function syncQuotes() {
         "⚠ Conflicts detected. Server data applied.";
     } else {
       document.getElementById("syncStatus").textContent =
-        "✅ Data already in sync.";
+  "Quotes synced with server!";
+
     }
   } catch (error) {
     console.error("Error syncing quotes:", error);
