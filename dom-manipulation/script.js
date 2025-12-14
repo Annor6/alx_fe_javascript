@@ -1,9 +1,13 @@
 // Quotes array
-let quotes = [
+let quotes = JSON.parse(localStorage.getItem("quotes")) || [
   { text: "Learning never exhausts the mind.", category: "Education" },
   { text: "JavaScript powers the web.", category: "Programming" },
   { text: "Success comes from consistency.", category: "Motivation" }
 ];
+function saveQuotes() {
+  localStorage.setItem("quotes", JSON.stringify(quotes));
+}
+
 
 // DOM Elements
 const quoteDisplay = document.getElementById("quoteDisplay");
@@ -12,11 +16,18 @@ const newQuoteBtn = document.getElementById("newQuote");
 // Show random quote
 function displayRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
+
   quoteDisplay.innerHTML = `
     <p>"${quotes[randomIndex].text}"</p>
     <small>Category: ${quotes[randomIndex].category}</small>
   `;
+
+  sessionStorage.setItem(
+    "lastQuote",
+    JSON.stringify(quotes[randomIndex])
+  );
 }
+
 
 
 // Create Add Quote Form dynamically (advanced DOM)
@@ -68,9 +79,9 @@ function addQuote() {
   }
 
   quotes.push({ text, category });
-  document.getElementById("newQuoteText").value = "";
-  document.getElementById("newQuoteCategory").value = "";
-  displayRandomQuote();
+saveQuotes();
+displayRandomQuote();
+
 
 }
 
@@ -81,3 +92,35 @@ newQuoteBtn.addEventListener("click", showRandomQuote);
 displayRandomQuote();
 
 createAddQuoteForm();
+function exportToJson() {
+  const blob = new Blob(
+    [JSON.stringify(quotes, null, 2)],
+    { type: "application/json" }
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "quotes.json";
+  link.click();
+
+  URL.revokeObjectURL(url);
+}
+document
+  .getElementById("exportQuotes")
+  .addEventListener("click", exportToJson);
+function importFromJsonFile(event) {
+  const fileReader = new FileReader();
+
+  fileReader.onload = function(event) {
+    const importedQuotes = JSON.parse(event.target.result);
+    quotes.push(...importedQuotes);
+    saveQuotes();
+    alert("Quotes imported successfully!");
+    displayRandomQuote();
+  };
+
+  fileReader.readAsText(event.target.files[0]);
+}
+displayRandomQuote();
