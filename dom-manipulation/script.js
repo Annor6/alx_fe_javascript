@@ -1,16 +1,17 @@
 const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
-async function fetchServerQuotes() {
+async function fetchQuotesFromServer() {
   const response = await fetch(SERVER_URL);
   const data = await response.json();
 
-  // Simulate server quotes structure
   return data.slice(0, 5).map(item => ({
     text: item.title,
     category: "Server"
   }));
 }
+
 async function syncWithServer() {
-  const serverQuotes = await fetchServerQuotes();
+ const serverQuotes = await fetchQuotesFromServer();
+
 
   const localQuotesJSON = JSON.stringify(quotes);
   const serverQuotesJSON = JSON.stringify(serverQuotes);
