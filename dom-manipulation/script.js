@@ -26,36 +26,44 @@ async function fetchQuotesFromServer() {
   }));
 }
 
-async function syncWithServer() {
- const serverQuotes = await fetchQuotesFromServer();
+async function syncQuotes() {
+  try {
+    const serverQuotes = await fetchQuotesFromServer();
 
+    const localQuotesJSON = JSON.stringify(quotes);
+    const serverQuotesJSON = JSON.stringify(serverQuotes);
 
-  const localQuotesJSON = JSON.stringify(quotes);
-  const serverQuotesJSON = JSON.stringify(serverQuotes);
+    if (localQuotesJSON !== serverQuotesJSON) {
+      // Conflict resolution: server wins
+      quotes = serverQuotes;
+      saveQuotes();
+      populateCategories();
+      filterQuotes();
 
-  if (localQuotesJSON !== serverQuotesJSON) {
-    // Conflict resolution: server wins
-    quotes = serverQuotes;
-    saveQuotes();
-    populateCategories();
-    filterQuotes();
-
+      document.getElementById("syncStatus").textContent =
+        "⚠ Conflicts detected. Server data applied.";
+    } else {
+      document.getElementById("syncStatus").textContent =
+        "✅ Data already in sync.";
+    }
+  } catch (error) {
+    console.error("Error syncing quotes:", error);
     document.getElementById("syncStatus").textContent =
-      "⚠ Conflicts detected. Server data applied.";
-  } else {
-    document.getElementById("syncStatus").textContent =
-      "✅ Data already in sync.";
+      "❌ Error syncing with server.";
   }
 }
+
 setInterval(() => {
-  syncWithServer();
+  syncQuotes();
+
 }, 30000); // every 30 seconds
 document
   .getElementById("syncServer")
-  .addEventListener("click", syncWithServer);
+  .addEventListener("click", syncQuotes);
 function manualResolve(useServer) {
   if (useServer) {
-    syncWithServer();
+    syncQuotes();
+
   } else {
     saveQuotes();
     document.getElementById("syncStatus").textContent =
