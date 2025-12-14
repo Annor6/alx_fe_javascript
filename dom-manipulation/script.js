@@ -1,3 +1,50 @@
+const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
+async function fetchServerQuotes() {
+  const response = await fetch(SERVER_URL);
+  const data = await response.json();
+
+  // Simulate server quotes structure
+  return data.slice(0, 5).map(item => ({
+    text: item.title,
+    category: "Server"
+  }));
+}
+async function syncWithServer() {
+  const serverQuotes = await fetchServerQuotes();
+
+  const localQuotesJSON = JSON.stringify(quotes);
+  const serverQuotesJSON = JSON.stringify(serverQuotes);
+
+  if (localQuotesJSON !== serverQuotesJSON) {
+    // Conflict resolution: server wins
+    quotes = serverQuotes;
+    saveQuotes();
+    populateCategories();
+    filterQuotes();
+
+    document.getElementById("syncStatus").textContent =
+      "⚠ Conflicts detected. Server data applied.";
+  } else {
+    document.getElementById("syncStatus").textContent =
+      "✅ Data already in sync.";
+  }
+}
+setInterval(() => {
+  syncWithServer();
+}, 30000); // every 30 seconds
+document
+  .getElementById("syncServer")
+  .addEventListener("click", syncWithServer);
+function manualResolve(useServer) {
+  if (useServer) {
+    syncWithServer();
+  } else {
+    saveQuotes();
+    document.getElementById("syncStatus").textContent =
+      "ℹ Local data preserved.";
+  }
+}
+
 // Quotes array
 let quotes = JSON.parse(localStorage.getItem("quotes")) || [
   { text: "Learning never exhausts the mind.", category: "Education" },
